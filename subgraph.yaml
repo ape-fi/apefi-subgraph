@@ -1,6 +1,6 @@
 specVersion: 0.0.2
-description: Iron Bank is a decentralized protocol to protocol lending platform.
-repository: https://github.com/ibdotxyz/ib-subgraph
+description: Ape Finance
+repository: https://github.com/ape-fi/apefi-subgraph
 schema:
   file: ./schema.graphql
 dataSources:
@@ -8,9 +8,9 @@ dataSources:
     name: Comptroller
     network: mainnet
     source:
-      address: "0xAB1c342C7bf5Ec5F02ADEA1c2270670bCa144CbB"
+      address: "0xDE607fe5Cb415d83Fe4A976afD97e5DaEeaedB07"
       abi: Comptroller
-      startBlock: 11384868
+      startBlock: 14786980
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -27,8 +27,6 @@ dataSources:
         - name: ERC20
           file: ./abis/ERC20.json
       eventHandlers:
-        - event: NewAdmin(address,address)
-          handler: handleNewAdmin
         - event: NewImplementation(address,address)
           handler: handleNewImplementation
         - event: NewCloseFactor(uint256,uint256)
@@ -57,12 +55,8 @@ dataSources:
           handler: handleNewCollateralFactor
         - event: NewBorrowCap(indexed address,uint256)
           handler: handleNewBorrowCap
-        - event: NewBorrowCapGuardian(address,address)
-          handler: handleNewBorrowCapGuardian
         - event: NewSupplyCap(indexed address,uint256)
           handler: handleNewSupplyCap
-        - event: NewSupplyCapGuardian(address,address)
-          handler: handleNewSupplyCapGuardian
         - event: CreditLimitChanged(address,address,uint256)
           handler: handleCreditLimitChanged
       file: ./src/mappings/comptroller.ts
@@ -88,7 +82,7 @@ templates:
       eventHandlers:
         - event: AccrueInterest(uint256,uint256,uint256,uint256)
           handler: handleAccrueInterest
-        - event: Mint(address,uint256,uint256)
+        - event: Mint(address,address,uint256,uint256)
           handler: handleMint
         - event: Redeem(address,uint256,uint256)
           handler: handleRedeem
@@ -98,8 +92,6 @@ templates:
           handler: handleRepayBorrow
         - event: LiquidateBorrow(address,address,uint256,address,uint256)
           handler: handleLiquidateBorrow
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
         - event: Flashloan(indexed address,uint256,uint256,uint256)
           handler: handleFlashloan
         - event: UserCollateralChanged(address,uint256)
@@ -108,12 +100,6 @@ templates:
           handler: handleNewReserveFactor
         - event: NewMarketInterestRateModel(address,address)
           handler: handleNewMarketInterestRateModel
-        - event: NewImplementation(address,address)
-          handler: handleNewImplementation
         - event: NewCollateralCap(address,uint256)
           handler: handleNewCollateralCap
-        - event: NewTokenName(string,string)
-          handler: handleNewTokenName
-        - event: NewTokenSymbol(string,string)
-          handler: handleNewTokenSymbol
       file: ./src/mappings/ctoken.ts

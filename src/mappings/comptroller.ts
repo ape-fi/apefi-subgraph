@@ -16,9 +16,7 @@ import {
   MarketExited,
   NewCollateralFactor,
   NewBorrowCap,
-  NewBorrowCapGuardian,
   NewSupplyCap,
-  NewSupplyCapGuardian,
   CreditLimitChanged
 } from '../../generated/Comptroller/Comptroller'
 
@@ -111,11 +109,11 @@ export function handleGlobalActionPaused(event: ActionPaused):void {
     comptroller.seizeGuardianPaused = pauseState
     comptroller.save()
   }
-  
+
 }
 
 export function handleCTokenActionPaused(event: ActionPaused1): void {
-  let market = Market.load(event.params.cToken.toHexString())
+  let market = Market.load(event.params.apeToken.toHexString())
   if (market != null) {
     let action = event.params.action
     let pauseState = event.params.pauseState
@@ -139,12 +137,12 @@ export function handleMarketListed(event: MarketListed): void {
   comptroller.save()
 
   // Create the market for this token, since it's now been listed.
-  let market = createMarket(event.params.cToken)
+  let market = createMarket(event.params.apeToken)
   market.save()
 }
 
 export function handleMarketDelisted(event: MarketDelisted): void {
-  let market = Market.load(event.params.cToken.toHexString())
+  let market = Market.load(event.params.apeToken.toHexString())
   if (market != null) {
     market.delisted = true
     market.save()
@@ -156,7 +154,7 @@ export function handleMarketDelisted(event: MarketDelisted): void {
 }
 
 export function handleMarketEntered(event: MarketEntered): void {
-  let market = Market.load(event.params.cToken.toHexString())
+  let market = Market.load(event.params.apeToken.toHexString())
   // Null check needed to avoid crashing on a new market added. Ideally when dynamic data
   // sources can source from the contract creation block and not the time the
   // comptroller adds the market, we can avoid this altogether
@@ -182,7 +180,7 @@ export function handleMarketEntered(event: MarketEntered): void {
 }
 
 export function handleMarketExited(event: MarketExited): void {
-  let market = Market.load(event.params.cToken.toHexString())
+  let market = Market.load(event.params.apeToken.toHexString())
   // Null check needed to avoid crashing on a new market added. Ideally when dynamic data
   // sources can source from the contract creation block and not the time the
   // comptroller adds the market, we can avoid this altogether
@@ -208,7 +206,7 @@ export function handleMarketExited(event: MarketExited): void {
 }
 
 export function handleNewCollateralFactor(event: NewCollateralFactor): void {
-  let market = Market.load(event.params.cToken.toHexString())
+  let market = Market.load(event.params.apeToken.toHexString())
   // Null check needed to avoid crashing on a new market added. Ideally when dynamic data
   // sources can source from the contract creation block and not the time the
   // comptroller adds the market, we can avoid this altogether
@@ -221,31 +219,19 @@ export function handleNewCollateralFactor(event: NewCollateralFactor): void {
 }
 
 export function handleNewBorrowCap(event: NewBorrowCap): void {
-  let market = Market.load(event.params.cToken.toHexString())
+  let market = Market.load(event.params.apeToken.toHexString())
   if (market != null) {
     market.borrowCap = event.params.newBorrowCap.toBigDecimal().div(exponentToBigDecimal(market.underlyingDecimals)).truncate(market.underlyingDecimals)
     market.save()
   }
 }
 
-export function handleNewBorrowCapGuardian(event: NewBorrowCapGuardian): void {
-  let comptroller = Comptroller.load('1') as Comptroller
-  comptroller.borrowCapGuardian = event.params.newBorrowCapGuardian
-  comptroller.save()
-}
-
 export function handleNewSupplyCap(event: NewSupplyCap): void {
-  let market = Market.load(event.params.cToken.toHexString())
+  let market = Market.load(event.params.apeToken.toHexString())
   if (market != null) {
     market.supplyCap = event.params.newSupplyCap.toBigDecimal().div(exponentToBigDecimal(market.underlyingDecimals)).truncate(market.underlyingDecimals)
     market.save()
   }
-}
-
-export function handleNewSupplyCapGuardian(event: NewSupplyCapGuardian): void {
-  let comptroller = Comptroller.load('1') as Comptroller
-  comptroller.supplyCapGuardian = event.params.newSupplyCapGuardian
-  comptroller.save()
 }
 
 export function handleCreditLimitChanged(event: CreditLimitChanged): void {
@@ -257,7 +243,7 @@ export function handleCreditLimitChanged(event: CreditLimitChanged): void {
   if (market != null){
     if (creditLimit == null){
       creditLimit = createCreditLimit(event)
-    } 
+    }
     creditLimit.creditLimit = event.params.creditLimit.toBigDecimal().div(exponentToBigDecimal(market.underlyingDecimals)).truncate(market.underlyingDecimals)
     creditLimit.blockTimestamp = event.block.timestamp.toI32()
     creditLimit.save()
